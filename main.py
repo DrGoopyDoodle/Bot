@@ -1,27 +1,39 @@
 import discord
-
-# La variable intents almacena los privilegios del bot
+import random, os
+from discord.ext import commands
 intents = discord.Intents.default()
-# Activar el privilegio de lectura de mensajes
-intents.message_content = True
-# Crear un bot en la variable cliente y transferirle los privilegios
-client = discord.Client(intents=intents)
-
-@client.event
+intents.messages = True
+intents.guilds = True
+bot = commands.Bot(command_prefix='.', intents=intents)
+# Evento que se activa cuando el bot está listo
+@bot.event
 async def on_ready():
-    print(f'Hemos iniciado sesión como {client.user}')
+    print(f'Bot conectado como {bot.user}')
+# Comando simple
+@bot.command()
+async def hola(ctx):
+    await ctx.send('¡Hola! ¿Cómo estás?')
+@bot.command()
+async def chao(ctx):
+    await ctx.send('Adios, que pases buen dia!')
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-    if message.content.startswith('$hello'):
-        await message.channel.send("Hi!")
-    elif message.content.startswith('$bye'):
-        await message.channel.send("\\U0001f642")
-    elif message.content.startswith('User'):
-        await message.channel.send("Bot")
-    else:
-        await message.channel.send(message.content)
+@bot.command()
+async def mem(ctx):
+    with open('images/mem1.jpg', 'rb') as f:
+        # ¡Vamos a almacenar el archivo de la biblioteca Discord convertido en esta variable!
+        picture = discord.File(f)
+    # A continuación, podemos enviar este archivo como parámetro.
+    await ctx.send(file=picture)
+@bot.command()
+async def memes(ctx):
+    img_name = random.choice(os.listdir('images'))
+    with open(f'images/{img_name}', 'rb') as f:
+        picture = discord.File(f)
 
-client.run("token")
+    await ctx.send(file=picture)
+
+@bot.command()
+async def ja(ctx, count_heh = 5):
+    await ctx.send("ja" * count_heh)
+
+bot.run("TOKEN")
